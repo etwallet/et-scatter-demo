@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0"> 
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.9.3/umd/popper.min.js" integrity="sha384-knhBOwpf8/28D6ygAjJeb0STNDZqfPbKaWQ8wIz/xgSc0xXwKsKhNype8fmfMka2" crossorigin="anonymous"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+    <!-- Scatter JS. -->
+    <script src="js/scatter.min.js"></script>
+    <script src="js/eos.min.js"></script>
+    <script src="js/tp.js"></script>
+    <script>
+  
+      // EOS RPC 网络设置
+      var network = {
+        blockchain:'eos',
+        protocol:'http',
+        host:'47.52.250.41',  
+        port:8001,
+        // protocol:'https',
+        // host:'tobet.io',  
+        // port:443,
+        chainId:'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+      };
+      var currentAccount = null;
+       
+     
+      // 连接
+      function connect(){
+        scatter.connect('MY_GAME_NAME').then(connected => {
+          if(connected){
+            alert('connect success');
+          }else{
+            alert('connect fail');
+          }
+        });
+      }
+      //断开
+      function goBack(){
+
+        var sUserAgent = window.navigator.userAgent;
+        if(sUserAgent){
+          alert(sUserAgent);
+        }
+        var extend = scatter.extend();
+        // extend.exit();
+        extend.getDappInfo('EOSMax').then(result => {
+          alert('getDappInfo result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getDappInfo error:'+JSON.stringify(error));
+        });
+        // var tt = window.history;
+        // if(!tt){
+        //   alert('undefined');
+        // }else{
+        //   alert('tt:'+JSON.stringify(tt));
+        // }
+        // window.history.back();
+        // scatter.disconnect();
+        // if(tp.isConnected())
+        // {
+        //   tp.back();
+        // }
+        // window.postMessage('网页向rn发送的消息');
+      }
+
+      // 登录，获取 EOS 账户
+      function login(){
+        // scatter.forgetIdentity();
+        // scatter.getIdentity({personal:['firstname', 'lastname', 'email', 'birthdate'],location:['phone', 'address', 'city', 'state', 'country', 'zipcode'],accounts:[network]}).then(result => {
+ 
+        //   currentAccount =  result.accounts[0];
+        //   alert('account:'+JSON.stringify(currentAccount));
+        // }).catch(error => {
+        //   alert('catch error');
+        //   alert('error:'+error.message);
+        // });
+        const requiredFields={
+          accounts:[{protocol:"https",
+               blockchain:"eos",
+               host:"eosapi.big.game",
+               port:8889,
+               chainId:"aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"}]
+        };
+          // scatter.getIdentity(requiredFields).then(function(){this.account=this.scatter.identity.accounts.find(function(e){return "eos"===e.blockchain});
+          scatter.getIdentity(requiredFields).then(()=>{
+             const account = scatter.identity.accounts.find(x => x.blockchain === "eos");
+             currentAccount = account;
+             alert('account:'+JSON.stringify(account));
+            }).catch(error => {
+              alert('catch error');
+              alert('error:'+error.message);
+            });
+            // const account = this.account = this.scatter.identity.accounts.find(x => x.blockchain === 'eos');
+
+      }
+      
+      function getInfo(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+          
+        eos.getInfo({}).then(result => {
+          alert('getInfo result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getInfo error:'+JSON.stringify(error));
+        });
+
+      }
+
+      function getActions(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+          
+        eos.getActions(-1, 10, 'eosio').then(result => {
+          alert('getActions result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getActions error:'+JSON.stringify(error));
+        });
+      }
+
+      function getKeyAccounts(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        // var public_key = "EOS615yFCAme2GibLH8SZKQjLHWveKQvb2hjR2S7BWbyaX1111111";
+        var public_key = {public_key:"EOS615yFCAme2GibLH8SZKQjLHWveKQvb2hjR2S7BWbyaX1111111"};
+        eos.getKeyAccounts(public_key).then(result => {
+          alert('getKeyAccounts result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getKeyAccounts error:'+JSON.stringify(error));
+        });
+
+      }
+      
+      function getCurrencyStats(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        var starttime = new Date().getTime();
+        eos.getCurrencyStats('betdicetoken','DICE').then(result => {
+          var endtime = new Date().getTime();
+          var interval = endtime - starttime;
+          alert('interval:' + interval + ' result:' + JSON.stringify(result));
+          // alert('getCurrencyStats result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getCurrencyStats error:'+JSON.stringify(error));
+        });
+
+      }
+      function getCurrencyBalance(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+          
+        eos.getCurrencyBalance('luckymetoken', currentAccount.name, 'ROLL').then(result => {
+          alert('getCurrencyBalance result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getCurrencyBalance error:'+JSON.stringify(error));
+        });
+
+      }
+
+      function getAccount(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+          
+        eos.getAccount(currentAccount.name).then(result => {
+          alert('getAccount result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('getAccount error:'+JSON.stringify(error));
+        });
+
+      }
+
+      // 转账
+      function transfer(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+          
+        eos.transfer(currentAccount.name, 'eostoken1111', '0.0100 EOS', 'scatter 转账测试',{broadcast:false}).then(result => {
+          alert('transfer result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('transfer error:'+JSON.stringify(error));
+        });
+
+      }
+      function transaction(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+
+         //  contracts can be a string or array
+
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        // var actions = [{account:"prochaintech",name:"click",authorization:[{actor:"eostokenhome",permission:"active"}],
+            //  data:{clickRequest:{account:"eostokenhome",candyId:9,ref:"tpdappincome"}}}];  
+//  var actions = [{account:"eosio.token",name:"transfer",authorization:[{actor:"eostokenhome",permission:"active"}],
+            //  data:{from:"eostokenhome",to:"betdiceadmin",quantity:"1.0000 EOS",memo:"action:bet,seed:OXVcUb9N2uwkXE2cFH,rollUnder:50,ref:tpdappincome"}}];  
+//  var actions = [
+//         {
+//           "account":"bingobetgame",
+//           "authorization":[
+//             {
+//               "actor":"eostokenhome",
+//               "permission":"active"
+//             }
+//           ],
+//           "data":{
+//             "player":"eostokenhome",
+//             "player_salt":"8262287742310359",
+//             "roll_under":50
+//           },
+//           "name":"playdice"
+//         },
+//         {
+//           "account":"eosio.token",
+//           "authorization":[
+//             {
+//               "actor":"eostokenhome",
+//               "permission":"active"
+//             }
+//           ],
+//           "data":{
+//             "from":"eostokenhome",
+//             "to":"bingobetgame",
+//             "quantity":"1.0000 EOS",
+//             "memo":""
+//           },
+//           "name":"transfer"
+//         }
+//     ];  
+// var actions = [{"account":"oneotc123451",
+//                 "name":"clientbid",
+//                 "authorization":
+//                  [{"actor":"eostokenhome","permission":"active"}],
+//                 "data":{"contract":"eosio.token",
+//                    "clientmaker":"eostokenhome",
+//                    "quantity":"2.0000 EOS",
+//                    "source":"eostokenpark",
+//                    "legaltype":"cny",
+//                    "bizid":10414,"price":"173250"}}];
+
+//         eos.transaction({actions:actions},{"expireSeconds":60,"broadcast":false,}).then(result => {
+//           alert('transaction result:'+JSON.stringify(result));
+//         }).catch(error => {
+//           alert('transaction error:'+JSON.stringify(error));
+//         });
+
+        var name="eostokenhome";
+        var game_account="eostoken1111";   
+        // eos.transaction("eosio.token",(e)=>{
+        //     e.transfer({from:name,to:game_account,quantity:"0.0010 EOS",memo:"50-seed-s"})
+        //     .then(result => {
+        //       alert('contracts result:'+JSON.stringify(result));
+        //     }).catch(error => {
+        //       alert('contracts error:'+JSON.stringify(error));
+        //     }); 
+        // }).then(result => {
+        //   alert('transaction result:'+JSON.stringify(result));
+        // }).catch(error => {
+        //   alert('transaction error:'+JSON.stringify(error));
+        // });
+
+        var authorization = [{actor:"eostokenhome",permission:"active"}];
+         eos.transaction(["eosio.token","whaleextrust"],(contracts)=>{
+          alert('transaction contracts:'+JSON.stringify(contracts));
+          contracts.eosio_token.transfer({from:name,to:game_account,quantity:"0.0010 EOS",memo:"50-seed-s"})
+           .then(result => {
+            alert('contracts result:'+JSON.stringify(result));
+           }).catch(error => {
+            alert('contracts error:'+JSON.stringify(error));
+           });
+          // contracts.whaleextrust.bind(actions,authorization)
+          // .then(result => {
+          //   alert('contracts result:'+JSON.stringify(result));
+          // }).catch(error => {
+          //   alert('contracts error:'+JSON.stringify(error));
+          // }); 
+
+        },{broadcast:false}).then(result => {
+          alert('transaction result:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('transaction error:'+JSON.stringify(error));
+        }); 
+
+      }
+      
+      function contract(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+
+        var tmp_network = {
+        blockchain:'eos',
+        protocol:'https',
+        host:'openapi.eos.ren',  
+        port:443,
+        chainId:'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+      };
+        scatter.getIdentity({accounts:[tmp_network]}).then(function(identity){
+          alert('account:'+JSON.stringify(identity));
+          var account = identity.accounts.find(x => x.blockchain === 'eos');
+          var options = {
+            authorization: account.name + '@' + account.authority,
+            broadcast:true,
+            sign: true
+          }
+       
+          var quantity = "0.0010 EOS";
+          var memo="";
+          var eos = scatter.eos(network, Eos);
+          eos.contract('enb.bank',options).then(contract => {
+            contract.useenbank(account.name,quantity,memo,options).then(result => {
+              alert('contracts result:'+JSON.stringify(result));
+
+            }).catch(error => {
+              alert('contracts.useenbank error:'+JSON.stringify(error));
+            }); 
+
+          }).catch(error => {
+            alert('contract error:'+JSON.stringify(error));
+          });
+
+        }
+        ).catch(error => {
+        // alert('error:'+JSON.stringify(error));
+          alert('error:'+error.message);
+        });
+
+        // alert(network.protocol+'://'+network.host);
+      //   var eos = scatter.eos(network, Eos);
+      //   var name="eostokenhome";
+      //   var game_account="eostoken1111";  
+
+      //   eos.contract('eosio.token').then(result => {
+      //       result.transfer({from:name,to:game_account,quantity:"0.0010 EOS",memo:"50-seed-s"})
+      //       .then(result => {
+      //         alert('contracts result:'+JSON.stringify(result));
+      //       }).catch(error => {
+      //         alert('contracts error:'+JSON.stringify(error));
+      //       }); 
+      //   }).catch(error => {
+      //     alert('contract error:'+JSON.stringify(error));
+      //   });
+
+      }
+
+    
+      function getTableRows1(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        
+        var obj = new Object();
+        obj.json = true;
+        obj.code = 'betdicegroup';
+        obj.scope = 'betdicegroup';
+        obj.table = 'uservip';
+        obj.lower_bound = currentAccount.name;
+        eos.getTableRows(obj).then(result => {
+          alert('result uservip:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+      }
+      function getTableRows2(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        
+        var obj = new Object();
+        obj.json = true;
+        obj.code = 'betdicestake';
+        obj.scope = 'betdicestake';
+        obj.table = 'stats';
+        obj.limit = 1;
+        eos.getTableRows(obj).then(result => {
+          alert('result betdicestake:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+      }
+      function getTableRows3(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        
+        var obj = new Object();
+        obj.json = true;
+        obj.code = 'betdicegroup';
+        obj.scope = 'betdicegroup';
+        obj.table = 'payoutstatus';
+        obj.limit = 1;
+        eos.getTableRows(obj).then(result => {
+          alert('result payoutstatus:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+      }
+      function getTableRows4(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        var eos = scatter.eos(network, Eos);
+        
+        var obj = new Object();
+        obj.json = true;
+        obj.code = 'betdicegroup';
+        obj.scope = 'betdicegroup';
+        obj.table = 'userbalance';
+        obj.key_type='i64';
+        obj.index_position = '2';
+        obj.lower_bound = currentAccount.name;
+        obj.limit = 10;
+        eos.getTableRows(obj).then(result => {
+          alert('result userbalance:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+      }
+      function authenticate(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        // var eos = scatter.eos(network, Eos);
+        scatter.authenticate('123456789012').then(result => {
+          alert('result authenticate:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+        // scatter.authenticate('fffdefabcdef').then(result => {
+        //   alert('result authenticate2:'+JSON.stringify(result));
+        // }).catch(error => {
+        //   alert('error:'+JSON.stringify(error));
+        // });
+
+      }
+
+      function getArbitrarySignature(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        // var eos = scatter.eos(network, Eos);
+        var publicKey = 'EOS615yFCAme2GibLH8SZKQjLHWveKQvb2hjR2S7BWbyaX1111111' // The key you want a signature for
+        // var data = '123456abcdefghij';        // Anything, or a hash ( sha256 )
+        // var isHash = false;  
+        var data = '6253e584e197fc5a8855698666f0dcb44755fa684e8105c6e8b27bbd4b76aa9c';
+        var isHash = true;
+        var whatFor = 'test whatFor';     // The reason you are requesting a signature from a user.
+        scatter.getArbitrarySignature(publicKey, data, whatfor, isHash).then(result => {
+          alert('result getArbitrarySignature:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+      }
+      function requestTransfer(){
+        if (currentAccount == null) {
+            alert('请先获取 EOS 账户');
+        }
+        // alert(network.protocol+'://'+network.host);
+        // var eos = scatter.eos(network, Eos);
+
+        var to = 'eostoken1111';        // Anything, or a hash ( sha256 )
+        var amount = '0.0100 EOS';     // The reason you are requesting a signature from a user.
+        var tokenDetails = {contract:'eosio.token', symbol:'EOS', memo:'test requestTransfer', decimals:4};
+        scatter.requestTransfer(network, to, amount, tokenDetails).then(result => {
+          alert('result requestTransfer:'+JSON.stringify(result));
+        }).catch(error => {
+          alert('error:'+JSON.stringify(error));
+        });
+
+      }
+
+      
+      
+    </script>
+  </head>
+  <body>
+  <div class="container bs-docs-container">
+    <h3>Scatter.js ET钱包调用方法实例 - EOS</h3>
+    <div class="row">
+      <div class="col-md-12"><button type="button" class="btn btn-primary btrequestTransfern-lg btn-block" onclick="connect()">连接</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-primary btrequestTransfern-lg btn-block" onclick="goBack()">断开</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-success btn-lg btn-block" onclick="login()">获取 EOS 账户</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-success btn-lg btn-block" onclick="getInfo()">getInfo</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getActions()">getActions</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getKeyAccounts()">getKeyAccounts</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getCurrencyStats()">getCurrencyStats</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getCurrencyBalance()">getCurrencyBalance</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getAccount()">getAccount</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="transfer()">transfer</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="transaction()">transaction</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="contract()">contract</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getTableRows1()">getTableRows1</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="authenticate()">authenticate</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getArbitrarySignature()">getArbitrarySignature</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="requestTransfer()">requestTransfer</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getTableRows2()">getTableRows2</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getTableRows3()">getTableRows3</button></div>
+      <br>
+      <div class="col-md-12"><button type="button" class="btn btn-warning btn-lg btn-block" onclick="getTableRows4()">getTableRows4</button></div>
+      <br>     
+      </div>
+  </div>
+  </body>
+</html>
